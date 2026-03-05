@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import json
+import os
 
 from src.feature_extractor import get_priority_map
 from src.point_sampler import sample_drone_points
@@ -24,16 +26,34 @@ def visulaize_sampling(priority_map, sampled_points):
     plt.axis('off')
     plt.show()
 
+def export_coords(image_name, num_drones, min_dist):
+    input_path = f"../data/input_images/{image_name}"
+    base_name = os.path.splitext(image_name)[0] # Remove extension
+    
+    output_path = f"../data/coordinates/{base_name}_coords.json"
+
+    priority_map = get_priority_map(input_path)
+    points = sample_drone_points(priority_map, num_drones=num_drones, min_dist=min_dist)
+
+    coord_data = {
+        "image_source": image_name,
+        "image_dimensions": priority_map.shape, # [height, width]
+        "drone_count": len(points),
+        "points": [{"x": p[0], "y": p[1]} for p in points]
+    }
+
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, 'w') as f:
+        json.dump(coord_data, f, indent=4)
+
+    print(f"---- {len(points)} coordinates saved to {output_path} ----")
+
 def main():
-    path = '../data/input_images/son.png'
-
+    image_name = "son.png"
     num_drones = 1000
-    min_dist = 5
+    min_dist = 3
 
-    priority_m = get_priority_map(path)
-    points = sample_drone_points(priority_m, num_drones, min_dist)
-
-    visulaize_sampling(priority_m, points)
+    export_coords(image_name, num_drones, min_dist)
 
 if __name__ == "__main__":
     main()
