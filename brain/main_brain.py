@@ -49,9 +49,9 @@ def export_coords(image_name, num_drones, min_dist):
     print(f"---- {len(points)} coordinates saved to {output_path} ----")
 
 def main():
-    image_name = "son.png"
-    num_drones = 1000
-    min_dist = 3
+    image_name = "apple.png"
+    num_drones = 200
+    min_dist = 5
 
     export_coords(image_name, num_drones, min_dist)
 
