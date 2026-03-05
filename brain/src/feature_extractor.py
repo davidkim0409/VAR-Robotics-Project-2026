@@ -4,17 +4,19 @@ import os
 
 from .features import *
 
-def get_priority_map(image):
-    if isinstance(image, (str, os.PathLike)):
-        image_path = str(image)
-        image = cv2.imread(image_path)
-        if image is None:
-            raise FileNotFoundError(f"Could not load image: {image_path}")
+def get_priority_map(image_path):
+    """
+    Gets the priority map using 6 feature maps.
+    Sets different weights on the feature maps according to their importance.
+    """
+
+    image = cv2.imread(image_path)
 
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     # Get feature maps
     canny_raw  = get_canny(gray)
+
     f_canny    = canny_raw.astype(float) / 255.0
     f_sobel    = get_sobel(gray).astype(float) / 255.0
     f_saliency = get_saliency(image).astype(float) / 255.0
