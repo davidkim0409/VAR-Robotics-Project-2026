@@ -3,7 +3,7 @@
 ## Image to Drone movement
 
 ### Repository Layout
-
+```
 VAR-ROBOTICS-PROJECT-2026
 ├── Dockerfile
 ├── README.md
@@ -26,3 +26,4 @@ VAR-ROBOTICS-PROJECT-2026
 │   ├── input_images
 │   └── outputs
 └── requirements.txt
+```
