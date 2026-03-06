@@ -5,7 +5,7 @@ Takes image, finds the main object of the image, samples num_drones amount of po
 
 ### Pipeline
 ```
-
+Image -> Extract Features -> Priority Map -> Sample Points -> JSON Coordinates file -> 
 ```
 
 ### Repository Layout
