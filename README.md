@@ -1,6 +1,13 @@
 # VAR-Robotics-Project-2026
 
 ## Image to Drone movement
+---
+Takes image, finds the main object of the image, samples num_drones amount of points to represent that image the most, then from the acheived coordinates, move the drones so that it forms the object.
+
+### Pipeline
+```
+
+```
 
 ### Repository Layout
 ```
@@ -27,3 +34,7 @@ VAR-ROBOTICS-PROJECT-2026
 │   └── outputs
 └── requirements.txt
 ```
+
+### Key Features
+
+### Build & Run
