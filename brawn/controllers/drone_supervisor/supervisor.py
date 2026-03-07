@@ -21,8 +21,8 @@ from ..drone_member import (
     CustomFormationAlgorithm,
 )
 
-# Brain output is 2D; use fixed z for all drones (single layer).
-Z_HEIGHT = 0.0
+# Brain output is 2D; formation is on one plane. YZ plane: X fixed.
+X_PLANE = 0.0
 # Single color for all drones (brain has no layers).
 DEFAULT_COLOR = (0.0, 1.0, 1.0)  # cyan, matches brain visualize_sampling
 
@@ -35,7 +35,8 @@ def _project_root() -> Path:
 def load_coords_brain(path: str | Path) -> tuple[list[np.ndarray], list[tuple[float, float, float]]]:
     """
     Load VAR brain coords from data/coordinates/*_coords.json.
-    Returns (target_positions_3d, colors). All points get same z and same color.
+    Returns (target_positions_3d, colors). Points on YZ plane (X=X_PLANE).
+    Image (x, y) -> 3D (X_PLANE, x, -y); Z shifted so all Z > 0.
     """
     path = Path(path)
     with open(path, encoding="utf-8") as f:
@@ -45,8 +46,14 @@ def load_coords_brain(path: str | Path) -> tuple[list[np.ndarray], list[tuple[fl
     colors = []
     for pt in points:
         x, y = float(pt["x"]), float(pt["y"])
-        target_positions.append(np.array([x, y, Z_HEIGHT], dtype=np.float64))
+        # YZ plane: (X, Y, Z) = (constant, x, -y)
+        target_positions.append(np.array([X_PLANE, x, -y], dtype=np.float64))
         colors.append(DEFAULT_COLOR)
+    # Shift Z so all coordinates are > 0
+    z_min = min(p[2] for p in target_positions)
+    z_offset = (1.0 - z_min) if z_min < 1.0 else 0.0
+    for p in target_positions:
+        p[2] += z_offset
     return target_positions, colors
 
 
@@ -55,14 +62,14 @@ def compute_grid_positions(
     spacing: float,
     grid_origin: tuple[float, float, float],
 ) -> list[np.ndarray]:
-    """Return n×n grid positions as list of (x, y, z) arrays."""
+    """Return n×n grid positions on XY plane (Z constant) as list of (x, y, z) arrays."""
     positions = []
     for i in range(n * n):
         col = i % n
         row = i // n
         x = grid_origin[0] + col * spacing
         y = grid_origin[1] + row * spacing
-        z = grid_origin[2]
+        z = grid_origin[2]  # constant (XY plane)
         positions.append(np.array([x, y, z], dtype=np.float64))
     return positions
 
@@ -76,11 +83,10 @@ def run(args: argparse.Namespace) -> None:
     N = len(target_positions)
     colors_arr = np.array(colors)
 
-    # Grid: n = ceil(sqrt(N)), origin below formation
-    min_x = min(p[0] for p in target_positions)
+    # Grid on XY plane (Z=0): n = ceil(sqrt(N)), origin in front of formation (negative X)
     min_y = min(p[1] for p in target_positions)
     n = math.ceil(math.sqrt(N))
-    grid_origin = (min_x - n * args.grid_spacing, min_y - n * args.grid_spacing, Z_HEIGHT)
+    grid_origin = (-n * args.grid_spacing, min_y - n * args.grid_spacing, 0.0)
     grid_positions = compute_grid_positions(n, args.grid_spacing, grid_origin)[:N]
 
     # Drones
@@ -264,8 +270,8 @@ def main() -> None:
     parser.add_argument(
         "--grid-spacing",
         type=float,
-        default=2.0,
-        help="Initial n×n grid spacing",
+        default=5.0,
+        help="Initial n×n grid spacing (wider = more space between drones)",
     )
     parser.add_argument(
         "--step-size",
