@@ -26,9 +26,9 @@ def get_priority_map(image_path):
     # Weight distribution: [canny, sobel, laplace, corners] = [0.4, 0.2, 0.2, 0.2]
     priority = (
         (0.50 * f_canny) +
-        (0.10 * f_sobel) + 
+        (0.20 * f_sobel) + 
         (0.20 * f_laplace) +
-        (0.20 * f_corners)
+        (0.10 * f_corners)
     )
 
     # If saliency is below 0.1, it's most likely a useless feature (shadows)
