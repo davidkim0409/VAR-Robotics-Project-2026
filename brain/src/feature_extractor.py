@@ -3,11 +3,13 @@ import numpy as np
 
 from .features import *
 
-def get_priority_map(image_path):
+def get_priority_map(image_name):
     """
     Gets the priority map using 6 feature maps.
     Sets different weights on the feature maps according to their importance.
     """
+
+    image_path = f"../data/input_images/{image_name}"
 
     image = cv2.imread(image_path)
 

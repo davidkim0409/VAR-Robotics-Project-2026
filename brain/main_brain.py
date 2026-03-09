@@ -26,6 +26,14 @@ def visulaize_sampling(priority_map, sampled_points):
     plt.axis('off')
     plt.show()
 
+def visulaize_priority_map(priority_map):
+    plt.figure("Priority Map", figsize=(8, 8))
+    plt.imshow(priority_map, cmap='magma', vmin=0.0, vmax=1.0)
+    plt.colorbar(label="Drone Priority (0.0 to 1.0)")
+    plt.title("Priority Map")
+    plt.axis('off')
+    plt.show()
+
 def export_coords(image_name, num_drones, min_dist):
     input_path = f"../data/input_images/{image_name}"
     base_name = os.path.splitext(image_name)[0] # Remove extension
@@ -48,12 +56,14 @@ def export_coords(image_name, num_drones, min_dist):
 
     print(f"---- {len(points)} coordinates saved to {output_path} ----")
 
-def main():
-    image_name = "apple.png"
-    num_drones = 200
-    min_dist = 5
-
-    export_coords(image_name, num_drones, min_dist)
-
 if __name__ == "__main__":
-    main()
+    image_name = "minion.png" 
+    num_drones = 200 
+    min_dist = 2
+
+    # export_coords(image_name, num_drones, min_dist)
+    
+    p_map = get_priority_map(image_name)
+    points = sample_drone_points(p_map, num_drones, min_dist)
+    visulaize_sampling(p_map, points)
+    visulaize_priority_map(p_map)
